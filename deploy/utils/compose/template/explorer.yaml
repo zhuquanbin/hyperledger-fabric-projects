@@ -1,0 +1,39 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+version: '2'
+
+services:
+  explorer:
+    container_name: fabric-explorer
+    image: hyperledger/explorer:0.3.9.1
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+  
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - DATABASE_HOST=127.0.0.1
+      - DATABASE_DATABASE=postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=
+      - SYNC_LOG_PATH=/tmp/explorer
+      - DISCOVERY_AS_LOCALHOST=false
+
+    volumes:
+      - ./config.json:/opt/explorer/app/platform/fabric/config.json
+      - ./crypto-config:/tmp/crypto-config
+      - ./explorer-log:/tmp/explorer
+
+    ports:
+      - "9360:8080"
+
+    extra_hosts:
+      - "orderer0:192.168.2.211"
+      - "orderer1:192.168.2.212"
+      - "orderer2:192.168.2.213"
+    

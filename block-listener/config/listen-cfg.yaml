@@ -1,0 +1,22 @@
+# the path of th crypto-config yaml
+crypto:
+  # CRYPTO_CONFIG_PATH are added to the system's environment, can be used in  "network-yaml-path"
+  crypto-config-path: "E:/ParcelX/Deployment/bootstrap/gen/fabric-config/crypto-config"
+
+  # the path of fabric go sdk configuration yaml file
+  network-yaml-path: "E:/ParcelX/Deployment/bootstrap/gen/go-sdk-config/fabric-orgEast-config.yaml"
+
+
+# the record of the channel block listens to
+record:
+  # Record every few seconds
+  seconds: 3
+  # The path to the height that the channel block listens to
+  data-path: "./config/.record.yaml"
+
+listen-channels:
+  - id: channeldev1
+    org: orgEast
+    user: User1
+    from: 2
+

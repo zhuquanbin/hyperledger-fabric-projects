@@ -1,0 +1,6 @@
+#python fabric for executing shell commands on remote hosts via SSH
+fabric>=2.4.0,<3.0
+# ruamel.yaml for prettifying yaml output
+ruamel.yaml==0.15.89
+wget==3.2
+sortedcontainers ==2.1.0

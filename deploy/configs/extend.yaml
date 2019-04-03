@@ -1,0 +1,59 @@
+version: "1"
+
+hosts:
+  pool:
+    h13:
+      ip: 192.168.2.113
+    h14:
+      ip: 192.168.2.114
+    h15:
+      ip: 192.168.2.115
+    h16:
+      ip: 192.168.2.116
+    h17:
+      ip: 192.168.2.117
+    h18:
+      ip: 192.168.2.118
+
+AddPeers:
+  orgEast:
+    - "h13"
+  orgNorth:
+    - "h14"
+
+AddOrgs:
+  orgWest:
+    conutry: "CN"
+    province: "Chongqing"
+    usersCount: 1
+    peers:
+      - "h15"
+      - "h16"
+  orgSouth:
+    conutry: "CN"
+    province: "Guangzhou"
+    usersCount: 1
+    peers:
+      - "h17"
+      - "h18"
+
+AddChannels:
+  channeldev2:
+    profile: ParcelXOrgsChannel2
+    consortium: ParcelXConsortium2
+    orgs:
+      - orgWest
+      - orgSouth
+    chaincodes:
+      example2:
+        version: 1.0
+        language: GO_LANG
+        chaincodePath: github.com/example
+        policyPath:
+        privateDataConfigPath:
+
+ExtendChannels:
+  channeldev1:
+    orgs:
+      - orgWest
+      - orgSouth

@@ -1,0 +1,44 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+  kafka:
+    image: hyperledger/fabric-kafka:${IMAGE_TAG}
+    container_name: kafka${KAFKA_NODE}
+    network_mode: host
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+    restart: always
+
+    environment:
+      - KAFKA_BROKER_ID=${KAFKA_NODE}
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER_SERVERS}
+      - KAFKA_MESSAGE_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
+      - KAFKA_REPLICA_FETCH_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
+      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
+      - KAFKA_LOG.DIRS=/opt/kafka/kafka-logs
+    
+    ports:
+      - "9092:9092"
+    
+    volumes:
+      - /data/kafka/${KAFKA_NODE}/logs:/opt/kafka/kafka-logs
+    
+    extra_hosts:
+       - "zookeeper0:192.168.2.211"
+       - "zookeeper1:192.168.2.212"
+       - "zookeeper2:192.168.2.213"
+       - "kafka0:192.168.2.211"
+       - "kafka1:192.168.2.212"
+       - "kafka2:192.168.2.213"
+       - "kafka3:192.168.2.213"
+

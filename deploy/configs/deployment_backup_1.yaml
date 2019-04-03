@@ -1,0 +1,105 @@
+# Copyright ParcelX Corp. All Rights Reserved.
+
+version: "1"
+
+configOutPath: "./gen/"
+
+hosts:
+  credential:
+    user: "parcelx"
+    password: "E3Tw2ILHgYlarRmN"
+
+  pool:
+    h1:
+      ip: 192.168.2.101
+    h2:
+      ip: 192.168.2.102
+    h3:
+      ip: 192.168.2.103
+    h4:
+      ip: 192.168.2.104
+    h5:
+      ip: 192.168.2.105
+    h6:
+      ip: 192.168.2.106
+    h7:
+      ip: 192.168.2.107
+    h8:
+      ip: 192.168.2.108
+    h9:
+      ip: 192.168.2.109
+    h10:
+      ip: 192.168.2.110
+    h11:
+      ip: 192.168.2.111
+    h12:
+      ip: 192.168.2.112
+
+fabric:
+  version:
+    zookeeper: "0.4.14"
+    kafka: "0.4.14"
+    orderer: "1.4.0"
+    peer: "1.4.0"
+
+  genesis: "ParcelXOrgsOrdererGenesis"
+
+  ordererOrg:
+    name: "orderer"
+    domain: "parcelx.io"
+    conutry: "CN"
+    province: "Shanghai"
+
+    zookeepers:
+      - "h1"
+      - "h2"
+      - "h3"
+
+    kafkas:
+      - "h1"
+      - "h2"
+      - "h3"
+      - "h4"
+
+    orderers:
+      - "h5"
+      - "h6"
+      - "h7"
+
+  peerOrgs:
+    orgEast:
+      #domain: 'orgEast.parcelx.io'
+      conutry: "CN"
+      province: "Shanghai"
+      usersCount: 1
+      peers:
+        - "h8"
+        - "h9"
+    orgNorth:
+      #domain: 'orgNorth.parcelx.io'
+      conutry: "CN"
+      province: "Beijing"
+      usersCount: 1
+      peers:
+       - 'h10'
+       - 'h11'
+
+  channels:
+    channeldev1:
+      profile: 'ENConsortiumChannel'
+      consortium: 'ENConsortium'
+      orgs:
+        - 'orgEast'
+        - 'orgNorth'
+      chaincodes:
+        example2:
+          version: 1.0
+          language: GO_LANG
+          chaincodePath: github.com/example
+          policyPath:
+          privateDataConfigPath:
+
+  explorer:
+    peer: 'h12'
+    channels:
+      - "channeldev1"

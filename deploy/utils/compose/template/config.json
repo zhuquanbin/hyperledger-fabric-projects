@@ -1,0 +1,79 @@
+{
+    "network-configs": {
+        "network-1": {
+            "version": "1.0",
+            "clients": {
+                "client-1": {
+                    "tlsEnable": true,
+                    "organization": "orgO",
+                    "channel": "parcelxchannelno1",
+                    "credentialStore": {
+                        "path": "./tmp/credentialStore/credential",
+                        "cryptoStore": {
+                            "path": "./tmp/credentialStore/crypto"
+                        }
+                    }
+                }
+            },
+            "channels": {
+                "parcelxchannelno1": {
+                    "peers": {
+                        "peer0.orgO.parcelx.io": {}
+                    },
+                    "connection": {
+                        "timeout": {
+                            "peer": {
+                                "endorser": "6000",
+                                "eventHub": "6000",
+                                "eventReg": "6000"
+                            }
+                        }
+                    }
+                }
+            },
+            "organizations": {
+                "OrdererMSP": {
+                    "mspid": "OrdererMSP",
+                    "adminPrivateKey": {
+                        "path": "/tmp/crypto/ordererOrganizations/parcelx.io/users/Admin@parcelx.io/msp/keystore"
+                    }
+                },
+                "orgO": {
+                    "mspid": "OrgOMSP",
+                    "fullpath": false,
+                    "adminPrivateKey": {
+                        "path": "/tmp/crypto/peerOrganizations/orgO.parcelx.io/users/Admin@orgO.parcelx.io/msp/keystore"
+                    },
+                    "signedCert": {
+                        "path": "/tmp/crypto/peerOrganizations/orgO.parcelx.io/users/Admin@orgO.parcelx.io/msp/signcerts"
+                    }
+                }
+            },
+            "peers": {
+                "peer0.orgO.parcelx.io": {
+                    "tlsCACerts": {
+                        "path": "/tmp/crypto/peerOrganizations/orgO.parcelx.io/peers/peer0.orgO.parcelx.io/tls/ca.crt"
+                    },
+                    "url": "grpcs://10.0.0.13:7051",
+                    "eventUrl": "grpcs://10.0.0.13:7053",
+                    "grpcOptions": {
+                        "ssl-target-name-override": "peer0.orgO.parcelx.io"
+                    }
+                }
+            },
+            "orderers": {
+                "orderer0.parcelx.io": {
+                    "url": "grpcs://10.0.0.4:7050"
+                },
+                "orderer1.parcelx.io": {
+                    "url": "grpcs://10.0.0.5:7050"
+                },
+                "orderer2.parcelx.io": {
+                    "url": "grpcs://10.0.0.6:7050"
+                }
+            }
+        },
+        
+        "license": "Apache-2.0"
+    }
+}

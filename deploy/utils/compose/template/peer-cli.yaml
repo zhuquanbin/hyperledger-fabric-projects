@@ -1,0 +1,44 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Example: https://github.com/hyperledger/fabric/tree/release-1.3/examples/e2e_cli
+
+version: '2'
+
+services:
+  peer-cli:
+    container_name: peer-cli${PEER_ID}.${PEER_ORG}.${DOMAIN}
+    image: hyperledger/fabric-tools:${IMAGE_TAG}
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      # - CORE_PEER_ADDRESS=peer1.orgEast.parcelx.io:7051
+      - CORE_PEER_ADDRESS=peer${PEER_ID}.${PEER_ORG}.${DOMAIN}:7051
+      - CORE_PEER_LOCALMSPID=${PEER_LOCALMSPID}
+      - CORE_PEER_LOCALMSPTYPE=bccsp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/fabric/crypto/peerOrganizations/${PEER_ORG}.${DOMAIN}/peers/peer${PEER_ID}.${PEER_ORG}.${DOMAIN}/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/fabric/crypto/peerOrganizations/${PEER_ORG}.${DOMAIN}/peers/peer${PEER_ID}.${PEER_ORG}.${DOMAIN}/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/fabric/crypto/peerOrganizations/${PEER_ORG}.${DOMAIN}/peers/peer${PEER_ID}.${PEER_ORG}.${DOMAIN}/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/etc/fabric/crypto/peerOrganizations/${PEER_ORG}.${DOMAIN}/users/Admin@${PEER_ORG}.${DOMAIN}/msp
+    working_dir: /root/
+#    command: /bin/bash -c './scripts/script.sh ${CHANNEL_NAME}; sleep $TIMEOUT'
+    volumes:
+      - /var/run/:/host/var/run/
+      - ${HOME}/gopath/:/opt/gopath/
+      - /data/fabric/peer${PEER_ID}.${PEER_ORG}.${DOMAIN}/cli-data:/root/cli-data
+      - ./crypto-config:/etc/fabric/crypto
+      
+      
+    extra_hosts:
+      - "orderer0.parcelx.io:192.168.2.211"
+      - "orderer1.parcelx.io:192.168.2.212"
+      - "orderer2.parcelx.io:192.168.2.213"
+      - "peer0.orgEast.parcelx.io:192.168.2.211"
+      - "peer1.orgEast.parcelx.io:192.168.2.212"
+      - "peer0.orgNorth.parcelx.io:192.168.2.213"
+      - "peer1.orgNorth.parcelx.io:192.168.2.214"

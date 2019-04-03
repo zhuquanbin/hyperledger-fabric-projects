@@ -1,0 +1,42 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+  zookeeper:
+    container_name: zookeeper${ZOOKEEPER_NODE}
+    image: hyperledger/fabric-zookeeper:${IMAGE_TAG}
+    network_mode: host
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+    restart: always
+
+    environment:
+      - ZOO_MY_ID=${ZOOKEEPER_NODE}
+      - ZOO_SERVERS=${ZOOKEEPER_SERVERS}
+
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+
+    extra_hosts:
+      - "zookeeper0:192.168.2.211"
+      - "zookeeper1:192.168.2.212"
+      - "zookeeper2:192.168.2.213"
+      - "kafka0:192.168.2.211"
+      - "kafka1:192.168.2.212"
+      - "kafka2:192.168.2.213"
+      - "kafka3:192.168.2.214"
+
+    volumes:
+      - /data/zookeeper/${ZOOKEEPER_NODE}/data:/data
+      - /data/zookeeper/${ZOOKEEPER_NODE}/datalog:/datalog
+
