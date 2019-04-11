@@ -11,21 +11,28 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"net/url"
 	"os"
+	"path"
 )
 
 var logger = logging.NewLogger("listener")
 
+// the struct of the listen-cfg.yaml config
 type Configuration struct {
 	NetworkCfg     CryptoConfig    `yaml:"crypto"`
 	Record         ChannelRecord   `yaml:"record"`
+	ThirdService   ThirdService    `yaml:"third-service"`
 	ListenChannels []ListenChannel `yaml:"listen-channels"`
 }
 
+// the path of th crypto-config yaml
 type CryptoConfig struct {
 	CryptoConfigPath string `yaml:"crypto-config-path"`
 	NetworkYamlPath  string `yaml:"network-yaml-path"`
 }
+
+// listen channels configuration
 type ListenChannel struct {
 	ChannelID    string `yaml:"id"`
 	OrgName      string `yaml:"org"`
@@ -33,12 +40,21 @@ type ListenChannel struct {
 	FromBlockNum uint64 `yaml:"from"`
 }
 
+// the service of transaction handing's configuration
+type ThirdService struct {
+	Url     string            `yaml:"url"`
+	Version string            `yaml:"version"`
+	Methods map[string]string `yaml:"methods"`
+}
+
+// the record of the channel block listens to
 type ChannelRecord struct {
 	Seconds  uint64 `yaml:"seconds"`
 	DataPath string `yaml:"data-path"`
 }
 
-type ListenCfgManagement struct {
+// the config manager of the block-listener service
+type ListenerContext struct {
 	cfg      Configuration   // yaml 配置
 	index    map[string]int  // channel 索引
 	logger   *logging.Logger // fabric sdk go logging
@@ -80,12 +96,26 @@ func (c *Configuration) initConfig() {
 	}
 }
 
-func NewListenCfgManagement(yamlPath string) *ListenCfgManagement {
+func (t *ThirdService) GetMethod(method string) (string, error) {
+	if v, ok := t.Methods[method]; ok {
+		u, err := url.Parse(t.Url)
+		if err != nil {
+			return "", fmt.Errorf("get method <%s> error: %v", method, err)
+		}
+		u.Path = path.Join(u.Path, t.Version)
+		u.Path = path.Join(u.Path, v)
+		return u.String(), nil
+	} else {
+		return "", fmt.Errorf("not found method: %s", method)
+	}
+}
+
+func NewListenerContext(yamlPath string) *ListenerContext {
 
 	if data, err := ioutil.ReadFile(yamlPath); err != nil {
-		logger.Fatalf("%s %v",yamlPath, err)
+		logger.Fatalf("%s %v", yamlPath, err)
 	} else {
-		lm := ListenCfgManagement{
+		lm := ListenerContext{
 			filepath: yamlPath,
 			logger:   logger,
 		}
@@ -104,16 +134,15 @@ func NewListenCfgManagement(yamlPath string) *ListenCfgManagement {
 	return nil
 }
 
-func (m *ListenCfgManagement) GetConfiguration() *Configuration {
+func (m *ListenerContext) GetConfiguration() *Configuration {
 	return &m.cfg
 }
 
-func (m *ListenCfgManagement) GetChannels() *[]ListenChannel {
+func (m *ListenerContext) GetChannels() *[]ListenChannel {
 	return &m.cfg.ListenChannels
 }
 
-
-func (m *ListenCfgManagement) UpdateChannelBlockFromNum(channel string, num uint64) {
+func (m *ListenerContext) UpdateChannelBlockFromNum(channel string, num uint64) {
 	if index, ok := m.index[channel]; ok {
 		m.cfg.ListenChannels[index].FromBlockNum = num
 	} else {
@@ -121,7 +150,7 @@ func (m *ListenCfgManagement) UpdateChannelBlockFromNum(channel string, num uint
 	}
 }
 
-func (m *ListenCfgManagement) RecordChannelListenHeight() {
+func (m *ListenerContext) RecordChannelListenHeight() {
 	if bArray, err := yaml.Marshal(m.cfg.ListenChannels); err != nil {
 		panic(fmt.Sprintf("dump config error: %v", err))
 	} else {
@@ -131,11 +160,11 @@ func (m *ListenCfgManagement) RecordChannelListenHeight() {
 	}
 }
 
-func (m *ListenCfgManagement) GetLogger() *logging.Logger {
+func (m *ListenerContext) GetLogger() *logging.Logger {
 	return m.logger
 }
 
-func (m *ListenCfgManagement) RecordEverySeconds() uint64 {
+func (m *ListenerContext) RecordEverySeconds() uint64 {
 	if m.cfg.Record.Seconds < 3 {
 		panic("The record interval is preferably greater than 3 seconds!")
 	}

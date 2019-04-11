@@ -10,13 +10,40 @@ crypto:
 # the record of the channel block listens to
 record:
   # Record every few seconds
-  seconds: 3
+  seconds: 30
   # The path to the height that the channel block listens to
   data-path: "./config/.record.yaml"
 
+
+# the service of transaction handing
+third-service:
+  url: "http://localhost:18081"
+  version: "/api/v1"
+  methods:
+    uploadParcel:   "/parcel/upload"
+    collect:        "/parcel/report/collect"
+    weigh:          "/parcel/weigh"
+    sendout:        "/parcel/report/sendout"
+    takeoff:        "/parcel/report/takeoff"
+    landing:        "/parcel/report/landing"
+    clearanceStart: "/parcel/report/clearance/start"
+    clearanceEnd:   "/parcel/report/clearance/end"
+    clearanceError: "/parcel/report/clearance/error"
+    handover:       "/parcel/report/handover"
+    delivery:       "/parcel/report/delivery"
+    signing:        "/parcel/report/signing"
+    stopDelivery:   "/parcel/delivery/stop"
+
+# to listen channels
 listen-channels:
   - id: channeldev1
     org: orgEast
     user: User1
-    from: 2
+    # the block number of channel starting to listen
+    from: 0
 
+  - id: channeldev2
+    org: orgEast
+    user: User1
+    # the block number of channel starting to listen
+    from: 0

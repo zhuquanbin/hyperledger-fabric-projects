@@ -19,7 +19,7 @@ var channelConnections map[string]*ChannelConnection = nil
 func getChannelConn(channelId string) *ChannelConnection {
 	if channelConnections == nil {
 		channelConnections = make(map[string]*ChannelConnection)
-		listenCfg := config.NewListenCfgManagement("./config/listen-cfg.yaml")
+		listenCfg := config.NewListenerContext("./config/listen-cfg.yaml")
 		network := NewFabricNetwork(listenCfg.GetConfiguration().NetworkCfg.NetworkYamlPath, nil)
 		for _, channel := range *listenCfg.GetChannels() {
 			c := network.NewChannelConnection(&channel)
@@ -43,7 +43,7 @@ func TestNewArgs(t *testing.T) {
 
 func TestInvokeCC(t *testing.T) {
 	channelCoon := getChannelConn("channeldev1")
-	ret, err := channelCoon.InvokeChainCode("example2", "set", NewArgs("b", "100"))
+	ret, err := channelCoon.InvokeChainCode("example2", "set", NewArgs("bc", "2000"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -52,7 +52,7 @@ func TestInvokeCC(t *testing.T) {
 
 func TestQueryCC(t *testing.T) {
 	channelCoon := getChannelConn("channeldev1")
-	ret, err := channelCoon.QueryChainCode("example2", "query", NewArgs("a"))
+	ret, err := channelCoon.QueryChainCode("example2", "query", NewArgs("b"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -70,6 +70,7 @@ func TestBlockEventListen(t *testing.T) {
 	bp := printer.NewBlockPrinterWithOpts(printer.AsOutputFormat("display"),
 		printer.AsWriterType("stdout"),
 		&printer.FormatterOpts{Base64Encode: false})
+
 	for {
 		select {
 		case e, ok := <-blockEventCh:
@@ -83,8 +84,7 @@ func TestBlockEventListen(t *testing.T) {
 				bp.PrintBlock(e.Block)
 			}
 		case <-time.After(time.Second * 20):
-			t.Logf("Did NOT receive block event in 20s!")
-			break
+			t.Fatal("Did NOT receive block event in 20s!")
 		}
 	}
 }
